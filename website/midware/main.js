@@ -34,13 +34,6 @@ function eraseCookie(name) {
 
 //recieves output data from socket and displays it on home.html
 socket.on("gtp", (text)=>{
-    hList = JSON.parse(sessionStorage.getItem('history'));
-    hList.push({
-        i: sessionStorage.getItem('i'),
-        c: sessionStorage.getItem('c'),
-        o: text
-    });
-    sessionStorage.setItem('history', JSON.stringify(hList));
     document.getElementById("output").innerHTML = text;
 });
 
