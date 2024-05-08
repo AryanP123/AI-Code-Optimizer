@@ -1,0 +1,18 @@
+{
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  },
+  "dependencies": {
+    "@google-cloud/language": "^6.3.0",
+    "@google/generative-ai": "^0.10.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.2",
+    "google-auth-library": "^9.9.0",
+    "openai": "^4.42.0",
+    "socket.io": "^4.5.4"
+  },
+  "scripts": {
+    "testServer": "nodemon website/initialize.js",
+    "testNormal": "node website/initialize.js"
+  }
+}
