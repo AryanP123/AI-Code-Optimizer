@@ -4,11 +4,24 @@ const app = express();
 const path = require('path');
 require('dotenv').config()
 
+console.log("Starting server...");
+console.log("API Key present:", !!process.env.GOOGLE_API_KEY);
+console.log("Port:", process.env.PORT || 4999);
+
+if (!process.env.GOOGLE_API_KEY) {
+    console.error("Missing GOOGLE_API_KEY in .env");
+    process.exit(1);
+}
+
+
+
 //app.use(express.static(__dirname + '/home.html')); // html
 app.use(express.static(path.join(__dirname, "midware"))); // js, css, images
 
 
-const server = app.listen(process.env.PORT || 4999);
+const server = app.listen(process.env.PORT || 4999, () => {
+    console.log(`Server running on port ${process.env.PORT || 4999}`);
+});
 
 app.get('/', function(req, res) {
     res.sendFile(path.join(__dirname, '/home.html'));
@@ -82,31 +95,32 @@ io.on('connection', function(socket){
 
 const genAI = new GoogleGenerativeAI(process.env.API_KEY);
 
+// Main Gemini completion function
 async function runCompletion(prompt) {
-
-    const model = genAI.getGenerativeModel({ model: "gemini-pro"});
-
-    let response;
-    let attempts = 0;
-
-    while (attempts < 10) {
-        try {
-            const result = await model.generateContent(prompt);
-            response = await result.response;
-            break; // if successful, break the loop
-        } catch (error) {
-            console.error(error);
-            attempts++;
-            console.log(`Attempt ${attempts} failed. Retrying...`);
-        }
-    }
-
-    if (response) {
-        return response.text();
-    } else {
-        throw new Error('Failed to generate content after 10 attempts');
+    try {
+        const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        
+        const result = await model.generateContent(prompt);
+        return result.response.text();
+    } catch (error) {
+        console.error("Main Gemini API Error:", error);
+        throw error;
     }
 }
+
+// Socket.io handler
+io.on('connection', (socket) => {
+    socket.on('prompt', async (prompt) => {
+        try {
+            const response = await runCompletion(prompt);
+            socket.emit('gtp', response);
+        } catch (error) {
+            console.error('Socket handler error:', error);
+            socket.emit('error', 'Failed to process request');
+        }
+    });
+});
 
 
 

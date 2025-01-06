@@ -6,12 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Gill Sans', sans-serif;
+        }
+
+        body {
+            background-color: rgba(49, 50, 66, 0.952);
+            color: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+        }
+
         .topnav {
             overflow: hidden;
             background-color: hsla(0, 0%, 100%, .05);
             margin-bottom: 50px;
         }
-    
+
         .topnav a {
             float: left;
             color: #f2f2f2;
@@ -20,41 +32,26 @@
             text-decoration: none;
             font-size: 17px;
         }
-    
+
         .topnav a:hover {
             background-color: #ddd;
             color: rgb(52, 53, 65);
         }
-        * {
-            box-sizing: border-box;
-            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-        }
-        body{
-            padding: auto;
-            color: white;
 
+        .radio-group {
+            
+            flex-direction: column;
+            
+            
         }
 
-        h2 {
-            font-weight: normal;
-            text-align: center;
-            color: white;
-            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        .radio-group input[type="radio"] {
+            margin-right: 1px;
         }
-    
-        textarea {
-            border: none;
-            color: white;
-            padding: 5px;
-            width: 600px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            resize: none;
-            background-color: rgb(52, 53, 65);
-            font-family: 'Courier New', Courier, monospace;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+
+        .radio-group label {
+            color: #f2f2f2;
+            font-size: 16px;
         }
     </style>
     <script>
@@ -71,14 +68,10 @@
 
         // Function to get a cookie
         function getCookie(name) {
-            var nameEQ = name + "=";
-            var ca = document.cookie.split(';');
-            for(var i=0;i < ca.length;i++) {
-                var c = ca[i];
-                while (c.charAt(0)==' ') c = c.substring(1,c.length);
-                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-            }
-            return null;
+            let matches = document.cookie.match(new RegExp(
+                "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+            ));
+            return matches ? decodeURIComponent(matches[1]) : undefined;
         }
 
         // Function to erase a cookie
@@ -90,19 +83,20 @@
         window.onload = function() {
             var preferences = JSON.parse(getCookie('preferences')) || {};
             for (var key in preferences) {
-                var checkbox = document.getElementById(key);
-                if (checkbox) checkbox.checked = preferences[key];
+                var radio = document.getElementById(key);
+                if (radio) radio.checked = preferences[key];
             }
         };
 
         // Save preferences to cookies when the button is clicked
         function updatePreferences() {
-            var checkboxes = document.querySelectorAll('#prefForm input[type=checkbox]');
-            var preferences = {};
-            for (var i = 0; i < checkboxes.length; i++) {
-                preferences[checkboxes[i].id] = checkboxes[i].checked;
-            }
-            setCookie('preferences', JSON.stringify(preferences), 7);
+            const form = document.forms['prefForm'];
+            const preference = form.elements['preference'].value;
+            const preferences = {};
+            preferences[preference] = true;
+            document.cookie = "preferences=" + JSON.stringify(preferences) + "; path=/";
+            alert('Preferences updated!');
+            return false; // Prevent form submission
         }
     </script>
 </head>
@@ -114,19 +108,26 @@
             </a>
         </div>
 
-        <form id="prefForm" name="prefForm"> 
-            <input type="checkbox" id="packages" name="packages" unchecked />
-            <label for="packages">Find Package Dependencies</label><br>
-            <input type="checkbox" id="documentation" name="documentation" unchecked />
-            <label for="packages">Provide Documentation</label><br>
-            <input type="checkbox" id="opti" name="opti" unchecked />
-            <label for="packages">Time/Memory Optimization</label><br>
-            <input type="checkbox" id="refactor" name="refactor" unchecked />
-            <label for="packages">Code Refactoring</label><br>
-            <input type="checkbox" id="vuln" name="vuln" unchecked />
-            <label for="packages">Find Security Vulnerabilities</label><br>
-            <input type="checkbox" id="debug" name="debug" unchecked />
-            <label for="packages">Debug</label><br>
+        <form id="prefForm" name="prefForm">
+            <div class="radio-group">
+                <input type="radio" id="packages" name="preference" value="packages" />
+                <label for="packages">Find Package Dependencies</label><br>
+                
+                <input type="radio" id="documentation" name="preference" value="documentation" />
+                <label for="documentation">Provide Documentation</label><br>
+                
+                <input type="radio" id="opti" name="preference" value="opti" />
+                <label for="opti">Time/Memory Optimization</label><br>
+                
+                <input type="radio" id="refactor" name="preference" value="refactor" />
+                <label for="refactor">Code Refactoring</label><br>
+                
+                <input type="radio" id="vuln" name="preference" value="vuln" />
+                <label for="vuln">Find Security Vulnerabilities</label><br>
+                
+                <input type="radio" id="debug" name="preference" value="debug" />
+                <label for="debug">Debug</label><br>
+            </div>
         </form>
 
         <a href="./home.html">
