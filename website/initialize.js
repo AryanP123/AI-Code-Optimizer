@@ -8,6 +8,7 @@ console.log("Starting server...");
 console.log("API Key present:", !!process.env.GOOGLE_API_KEY);
 console.log("Port:", process.env.PORT || 4999);
 
+
 if (!process.env.GOOGLE_API_KEY) {
     console.error("Missing GOOGLE_API_KEY in .env");
     process.exit(1);
@@ -94,6 +95,7 @@ io.on('connection', function(socket){
 
 
 const genAI = new GoogleGenerativeAI(process.env.API_KEY);
+console.log("API initialization status:", !!genAI);
 
 // Main Gemini completion function
 async function runCompletion(prompt) {
